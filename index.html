@@ -39,7 +39,8 @@
   .user-badge .role-tag{background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;text-transform:uppercase;letter-spacing:0.03em;}
   .lang-toggle{display:flex;background:var(--panel2);border:1px solid var(--border);border-radius:9px;padding:3px;gap:2px;}
   .lang-btn{background:transparent;border:none;color:var(--muted);padding:6px 12px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;}
-  .lang-btn.active{background:var(--accent);color:#fff;}
+  .attn-badge{display:none;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;background:var(--red);color:#fff;font-size:12px;font-weight:700;border-radius:11px;margin-left:8px;vertical-align:middle;animation:pulseAttn 1.8s ease-in-out infinite;}
+  @keyframes pulseAttn{0%,100%{box-shadow:0 0 0 0 rgba(240,80,90,0.5);}50%{box-shadow:0 0 0 6px rgba(240,80,90,0);}}
 
   /* Login gate */
   .login-bg{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;align-items:center;justify-content:center;}
@@ -216,7 +217,7 @@
 
 <header>
   <div>
-    <h1 id="appTitle">Lala Tech <span class="dot">·</span> Request Tracker</h1>
+    <h1 id="appTitle">Lala Tech <span class="dot">·</span> Request Tracker<span class="attn-badge" id="attnBadge" title="Requests needing attention">0</span></h1>
     <div class="sub" id="appSub">One place for every client request. No more lost WhatsApp asks.</div>
   </div>
   <div class="header-right">
@@ -496,8 +497,8 @@ function applyI18n(){
   document.getElementById('langEn').classList.toggle('active', currentLang==='en');
   document.getElementById('langHi').classList.toggle('active', currentLang==='hi');
   document.getElementById('appTitle').innerHTML = currentLang==='en'
-    ? 'Lala Tech <span class="dot">·</span> Request Tracker'
-    : 'Lala Tech <span class="dot">·</span> रिक्वेस्ट ट्रैकर';
+    ? 'Lala Tech <span class="dot">·</span> Request Tracker<span class="attn-badge" id="attnBadge" title="Requests needing attention">0</span>'
+    : 'Lala Tech <span class="dot">·</span> रिक्वेस्ट ट्रैकर<span class="attn-badge" id="attnBadge" title="Requests needing attention">0</span>';
   document.getElementById('appSub').textContent = tr('appSub');
   document.getElementById('newReqBtn').textContent = tr('newRequest');
   document.getElementById('search').placeholder = tr('searchPh');
@@ -799,6 +800,16 @@ function renderAttention(){
 
   const panel = document.getElementById('attentionPanel');
   const totalAttn = overdue.length + waitingForUs.length + unassigned.length; // client-blocked items aren't "urgent" by default
+
+  const badge = document.getElementById('attnBadge');
+  if(badge){
+    if(totalAttn > 0){
+      badge.textContent = totalAttn;
+      badge.style.display = 'inline-flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
 
   if(open.length === 0){
     panel.innerHTML = `
