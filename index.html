@@ -6,34 +6,70 @@
 <title>Lala Tech — Request Tracker</title>
 <style>
   :root{
-    --bg:#0f1115; --panel:#171a21; --panel2:#1e2229; --border:#2a2f3a;
-    --text:#e8eaed; --muted:#9aa2b1; --accent:#5b8def; --green:#3ecf8e;
+    --bg:#0b0d12; --panel:#171a21; --panel2:#1e2229; --border:#2a2f3a;
+    --text:#e8eaed; --muted:#9aa2b1; --accent:#5b8def; --accent2:#7ba3f5; --green:#3ecf8e;
     --amber:#f5a524; --red:#f0505a; --purple:#a78bfa;
     font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
   }
   *{box-sizing:border-box;}
-  body{margin:0;background:var(--bg);color:var(--text);}
+  body{
+    margin:0;color:var(--text);
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(91,141,239,0.10), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 0%, rgba(167,139,250,0.07), transparent 55%),
+      var(--bg);
+    background-attachment:fixed;
+  }
+  ::selection{background:rgba(91,141,239,0.35);}
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:8px;}
+  ::-webkit-scrollbar-thumb:hover{background:#3a4152;}
+
   header{
     display:flex;justify-content:space-between;align-items:center;
     padding:18px 28px;border-bottom:1px solid var(--border);
-    position:sticky;top:0;background:var(--bg);z-index:10;
+    position:sticky;top:0;background:rgba(11,13,18,0.85);backdrop-filter:blur(10px);z-index:10;
   }
-  header h1{font-size:18px;margin:0;font-weight:700;}
-  header .sub{color:var(--muted);font-size:12px;margin-top:2px;}
+  header h1{font-size:18.5px;margin:0;font-weight:700;letter-spacing:-0.01em;}
+  header h1 .dot{color:var(--accent);}
+  header .sub{color:var(--muted);font-size:12px;margin-top:3px;}
+  .header-right{display:flex;align-items:center;gap:10px;}
+  .user-badge{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--border);padding:6px 12px;border-radius:20px;font-size:12.5px;}
+  .user-badge .role-tag{background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;text-transform:uppercase;letter-spacing:0.03em;}
+  .lang-toggle{display:flex;background:var(--panel2);border:1px solid var(--border);border-radius:9px;padding:3px;gap:2px;}
+  .lang-btn{background:transparent;border:none;color:var(--muted);padding:6px 12px;border-radius:7px;font-size:12.5px;font-weight:600;cursor:pointer;}
+  .lang-btn.active{background:var(--accent);color:#fff;}
+
+  /* Login gate */
+  .login-bg{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;align-items:center;justify-content:center;}
+  .login-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:28px;width:360px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.5);}
+  .login-card h2{margin:0 0 4px;font-size:18px;}
+  .login-card .sub{color:var(--muted);font-size:12.5px;margin-bottom:18px;}
+  .role-pick{display:flex;gap:8px;margin-bottom:14px;}
+  .role-pick button{flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:10px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:600;}
+  .role-pick button.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .login-err{color:var(--red);font-size:12px;margin-top:6px;display:none;}
+
   .btn{
     background:var(--accent);color:#fff;border:none;padding:9px 16px;
-    border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;
+    border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;
+    transition:transform 0.12s ease, box-shadow 0.12s ease, background 0.15s ease;
+    box-shadow:0 1px 2px rgba(0,0,0,0.2);
   }
-  .btn:hover{opacity:0.9;}
-  .btn.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--border);}
-  main{padding:20px 28px 60px;max-width:1300px;margin:0 auto;}
+  .btn:hover{background:var(--accent2);transform:translateY(-1px);box-shadow:0 4px 12px rgba(91,141,239,0.28);}
+  .btn:active{transform:translateY(0);}
+  .btn.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--border);box-shadow:none;}
+  .btn.secondary:hover{background:#242933;border-color:#3a4152;box-shadow:none;transform:none;}
+  main{padding:22px 28px 70px;max-width:1340px;margin:0 auto;}
 
   .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px;}
   .stat-card{
-    background:var(--panel);border:1px solid var(--border);border-radius:12px;
-    padding:16px 18px;
+    background:var(--panel);border:1px solid var(--border);border-radius:13px;
+    padding:16px 18px;transition:border-color 0.15s ease, transform 0.15s ease;
   }
-  .stat-card .num{font-size:26px;font-weight:700;}
+  .stat-card:hover{border-color:#3a4152;transform:translateY(-2px);}
+  .stat-card .num{font-size:27px;font-weight:700;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;}
   .stat-card .label{color:var(--muted);font-size:12.5px;margin-top:4px;}
   .stat-card.overdue .num{color:var(--red);}
   .stat-card.stale .num{color:var(--amber);}
@@ -44,74 +80,178 @@
   }
   .controls input, .controls select{
     background:var(--panel2);border:1px solid var(--border);color:var(--text);
-    padding:8px 10px;border-radius:8px;font-size:13px;
+    padding:9px 11px;border-radius:9px;font-size:13px;transition:border-color 0.15s ease;
   }
+  .controls input:focus, .controls select:focus{outline:none;border-color:var(--accent);}
   .controls input{flex:1;min-width:180px;}
   .spacer{flex:1;}
 
-  table{width:100%;border-collapse:collapse;background:var(--panel);border-radius:12px;overflow:hidden;border:1px solid var(--border);}
-  thead th{
-    text-align:left;font-size:12px;color:var(--muted);text-transform:uppercase;
-    letter-spacing:0.03em;padding:12px 14px;border-bottom:1px solid var(--border);background:var(--panel2);
+  .view-toggle{display:flex;background:var(--panel2);border:1px solid var(--border);border-radius:9px;padding:3px;gap:2px;}
+  .vt-btn{
+    background:transparent;border:none;color:var(--muted);padding:6px 13px;border-radius:7px;
+    font-size:12.5px;font-weight:600;cursor:pointer;transition:all 0.15s ease;
   }
-  tbody td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13.5px;vertical-align:top;}
+  .vt-btn.active{background:var(--accent);color:#fff;}
+  .vt-btn:not(.active):hover{color:var(--text);}
+
+  table{width:100%;border-collapse:collapse;background:var(--panel);border-radius:13px;overflow:hidden;border:1px solid var(--border);}
+  thead th{
+    text-align:left;font-size:11.5px;color:var(--muted);text-transform:uppercase;
+    letter-spacing:0.04em;padding:12px 14px;border-bottom:1px solid var(--border);background:var(--panel2);
+  }
+  tbody td{padding:13px 14px;border-bottom:1px solid var(--border);font-size:13.5px;vertical-align:top;}
   tbody tr:last-child td{border-bottom:none;}
+  tbody tr{transition:background 0.1s ease;}
   tbody tr:hover{background:#1b1f28;cursor:pointer;}
   .client-name{font-weight:600;}
-  .desc{color:var(--muted);font-size:12.5px;margin-top:2px;max-width:280px;}
+  .desc{color:var(--muted);font-size:12.5px;margin-top:3px;max-width:280px;line-height:1.4;}
 
-  .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:600;}
+  .badge{display:inline-block;padding:3.5px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:0.01em;white-space:nowrap;}
   .badge.New{background:#2a3550;color:#8fb4ff;}
+  .badge.NeedsClarification{background:#3a2545;color:var(--purple);}
+  .badge.ReadyToAssign{background:#233a3a;color:#5fd6d6;}
   .badge.InProgress{background:#3a3320;color:var(--amber);}
-  .badge.Waiting{background:#3a2545;color:var(--purple);}
+  .badge.WaitingOnClient{background:#3a2545;color:var(--purple);}
   .badge.Done{background:#1e3a2e;color:var(--green);}
+  .badge.client-side{opacity:0.9;}
 
-  .prio{font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:5px;}
+  .prio{font-size:11px;font-weight:700;padding:2.5px 8px;border-radius:6px;letter-spacing:0.02em;}
   .prio.High{background:#3a1f22;color:var(--red);}
   .prio.Medium{background:#3a3320;color:var(--amber);}
   .prio.Low{background:#232a38;color:var(--muted);}
 
-  .flag{color:var(--red);font-size:11px;font-weight:700;margin-top:4px;}
-  .owner-pill{background:var(--panel2);padding:3px 9px;border-radius:20px;font-size:12px;border:1px solid var(--border);}
+  .flag{color:var(--red);font-size:11px;font-weight:700;margin-top:5px;display:flex;align-items:center;gap:4px;}
+  .owner-pill{background:var(--panel2);padding:3.5px 10px;border-radius:20px;font-size:11.5px;border:1px solid var(--border);font-weight:500;}
+
+  /* Board / Kanban view */
+  .board{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;align-items:start;}
+  .board-col{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:10px;min-height:120px;}
+  .board-col-head{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 10px;}
+  .board-count{color:var(--muted);font-size:11.5px;font-weight:700;background:var(--panel2);padding:2px 8px;border-radius:12px;}
+  .board-col-body{display:flex;flex-direction:column;gap:8px;min-height:60px;}
+  .board-empty{color:var(--muted);font-size:11.5px;text-align:center;padding:18px 4px;border:1.5px dashed var(--border);border-radius:9px;}
+  .board-card{
+    background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px 11px;
+    cursor:pointer;transition:border-color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease;
+  }
+  .board-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,0.25);}
+  .bc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:6px;margin-bottom:5px;}
+  .bc-top .client-name{font-size:13px;}
+  .bc-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:9px;}
+  .bc-due{color:var(--muted);font-size:11px;}
 
   .modal-bg{
-    display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);
-    align-items:center;justify-content:center;z-index:50;
+    display:none;position:fixed;inset:0;background:rgba(6,7,10,0.65);backdrop-filter:blur(3px);
+    align-items:center;justify-content:center;z-index:50;animation:fadeIn 0.15s ease;
   }
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+  @keyframes slideUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
   .modal-bg.open{display:flex;}
   .modal{
-    background:var(--panel);border:1px solid var(--border);border-radius:14px;
+    background:var(--panel);border:1px solid var(--border);border-radius:16px;
     padding:24px;width:480px;max-width:92vw;max-height:88vh;overflow-y:auto;
+    box-shadow:0 20px 60px rgba(0,0,0,0.5);animation:slideUp 0.18s ease;
   }
-  .modal h2{margin-top:0;font-size:17px;}
+  .modal h2{margin-top:0;font-size:17px;letter-spacing:-0.01em;}
   .field{margin-bottom:13px;}
   .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600;}
   .field input,.field select,.field textarea{
     width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text);
-    padding:9px 10px;border-radius:8px;font-size:13.5px;font-family:inherit;
+    padding:9px 10px;border-radius:9px;font-size:13.5px;font-family:inherit;transition:border-color 0.15s ease;
   }
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);}
   .field textarea{resize:vertical;min-height:60px;}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;}
 
-  .notes-list{max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px;margin-bottom:10px;background:var(--panel2);}
-  .note{padding:6px 8px;border-bottom:1px solid var(--border);font-size:12.5px;}
+  .notes-list{max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:9px;padding:8px;margin-bottom:10px;background:var(--panel2);}
+  .note{padding:7px 8px;border-bottom:1px solid var(--border);font-size:12.5px;line-height:1.45;}
   .note:last-child{border-bottom:none;}
   .note .meta{color:var(--muted);font-size:11px;margin-bottom:2px;}
   .empty{color:var(--muted);text-align:center;padding:40px;font-size:13px;}
+
+  .attention{
+    background:linear-gradient(160deg,#231419,#171a21 60%);
+    border:1px solid #4a2229;border-radius:15px;padding:17px 19px;margin-bottom:22px;
+    box-shadow:0 8px 24px rgba(150,30,40,0.06);
+  }
+  .attention.clear{background:var(--panel);border:1px solid var(--border);box-shadow:none;}
+  .attention h2{
+    margin:0 0 4px 0;font-size:14px;display:flex;align-items:center;gap:8px;color:#ff8a90;letter-spacing:-0.01em;
+  }
+  .attention.clear h2{color:var(--green);}
+  .attention .sub{color:var(--muted);font-size:12px;margin-bottom:13px;}
+  .attn-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;}
+  .attn-col h3{
+    font-size:11px;text-transform:uppercase;letter-spacing:0.03em;color:var(--muted);
+    margin:0 0 8px 0;display:flex;align-items:center;gap:6px;
+  }
+  .attn-col h3 .dot{width:7px;height:7px;border-radius:50%;display:inline-block;}
+  .dot.red{background:var(--red);} .dot.amber{background:var(--amber);} .dot.gray{background:var(--muted);} .dot.purple{background:var(--purple);}
+  .attn-item{
+    background:var(--panel2);border:1px solid var(--border);border-radius:9px;
+    padding:8px 10px;margin-bottom:6px;font-size:12.5px;cursor:pointer;transition:border-color 0.15s ease, transform 0.12s ease;
+  }
+  .attn-item:hover{border-color:var(--accent);transform:translateX(2px);}
+  .attn-item .c{font-weight:600;}
+  .attn-item .d{color:var(--muted);font-size:11.5px;margin-top:1px;}
+  .attn-none{color:var(--muted);font-size:12px;padding:6px 2px;}
+  .attn-more{color:var(--accent);font-size:11.5px;padding:2px;}
+
+  @media (max-width: 1100px){
+    .stats{grid-template-columns:repeat(3,1fr);}
+    .attn-grid{grid-template-columns:1fr 1fr;}
+    .board{grid-template-columns:repeat(3,1fr);}
+  }
+  @media (max-width: 700px){
+    header{padding:14px 16px;}
+    main{padding:16px 16px 50px;}
+    .stats{grid-template-columns:1fr 1fr;}
+    .attn-grid{grid-template-columns:1fr;}
+    .board{grid-template-columns:1fr;}
+  }
 </style>
 </head>
 <body>
 
 <header>
   <div>
-    <h1>Lala Tech — Request Tracker</h1>
-    <div class="sub">One place for every client request. No more lost WhatsApp asks.</div>
+    <h1 id="appTitle">Lala Tech <span class="dot">·</span> Request Tracker</h1>
+    <div class="sub" id="appSub">One place for every client request. No more lost WhatsApp asks.</div>
   </div>
-  <button class="btn" onclick="openAddModal()">+ New Request</button>
+  <div class="header-right">
+    <div class="lang-toggle">
+      <button class="lang-btn" id="langEn" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" id="langHi" onclick="setLang('hi')">हिं</button>
+    </div>
+    <div class="user-badge" id="userBadge" style="display:none;"></div>
+    <button class="btn secondary" id="logoutBtn" onclick="logout()" style="display:none;">Logout</button>
+    <button class="btn" id="newReqBtn" onclick="openAddModal()" style="display:none;">+ New Request</button>
+  </div>
 </header>
 
+<div class="login-bg" id="loginGate">
+  <div class="login-card">
+    <h2 id="loginTitle">Who's working right now?</h2>
+    <div class="sub" id="loginSub">Pick your role and enter your name to see your work.</div>
+    <div class="role-pick">
+      <button type="button" id="roleEmpBtn" class="active" onclick="pickRole('employee')">Employee</button>
+      <button type="button" id="roleMgrBtn" onclick="pickRole('manager')">Manager</button>
+    </div>
+    <div class="field">
+      <label id="loginNameLabel">Your Name</label>
+      <input id="loginName" list="ownerList" placeholder="e.g. Priya">
+    </div>
+    <div class="login-err" id="loginErr">Please enter your name.</div>
+    <div class="modal-actions">
+      <button class="btn" id="loginBtn" onclick="doLogin()" style="width:100%;">Continue</button>
+    </div>
+  </div>
+</div>
+
 <main>
+  <div id="attentionPanel"></div>
+
   <div class="stats" id="stats"></div>
 
   <div class="controls">
@@ -119,20 +259,31 @@
     <select id="filterOwner" onchange="render()"><option value="">All owners</option></select>
     <select id="filterStatus" onchange="render()">
       <option value="">All statuses</option>
-      <option value="New">New</option>
+      <option value="New">New Request</option>
+      <option value="NeedsClarification">Needs Clarification</option>
+      <option value="ReadyToAssign">Ready to Assign</option>
       <option value="InProgress">In Progress</option>
-      <option value="Waiting">Waiting on Client</option>
+      <option value="WaitingOnClient">Waiting on Client</option>
       <option value="Done">Done</option>
     </select>
+    <select id="filterBucket" onchange="render()">
+      <option value="">All (waiting for us / client)</option>
+      <option value="us">Waiting for us</option>
+      <option value="client">Waiting for client</option>
+    </select>
     <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);">
-      <input type="checkbox" id="onlyFollowup" onchange="render()" style="width:auto;"> Needs follow-up only
+      <input type="checkbox" id="onlyFollowup" onchange="render()" style="width:auto;"> <span id="followupLabel">Overdue / needs follow-up only</span>
     </label>
     <div class="spacer"></div>
-    <button class="btn secondary" onclick="seedDemo()">Load demo data</button>
-    <button class="btn secondary" onclick="clearAll()">Clear all</button>
+    <div class="view-toggle">
+      <button class="vt-btn active" id="vtList" onclick="setView('list')">☰ List</button>
+      <button class="vt-btn" id="vtBoard" onclick="setView('board')">▦ Board</button>
+    </div>
+    <button class="btn secondary" id="demoBtn" onclick="seedDemo()">Load demo data</button>
+    <button class="btn secondary" id="clearBtn" onclick="clearAll()">Clear all</button>
   </div>
 
-  <table>
+  <table id="listView">
     <thead>
       <tr>
         <th>Client / Request</th>
@@ -146,6 +297,8 @@
     </thead>
     <tbody id="taskBody"></tbody>
   </table>
+
+  <div id="boardView" class="board" style="display:none;"></div>
 </main>
 
 <!-- Add/Edit Modal -->
@@ -171,9 +324,11 @@
     </div>
     <div class="field"><label>Status</label>
       <select id="f_status">
-        <option value="New">New</option>
+        <option value="New">New Request</option>
+        <option value="NeedsClarification">Needs Clarification</option>
+        <option value="ReadyToAssign">Ready to Assign</option>
         <option value="InProgress">In Progress</option>
-        <option value="Waiting">Waiting on Client</option>
+        <option value="WaitingOnClient">Waiting on Client</option>
         <option value="Done">Done</option>
       </select>
     </div>
@@ -200,6 +355,193 @@
 const STORAGE_KEY = 'lala_tasks_v1';
 let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 let editingId = null;
+let currentView = localStorage.getItem('lala_view') || 'list';
+
+// ---------- Login / role-based access ----------
+const SESSION_KEY = 'lala_session_v1';
+let session = JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+let pendingRole = 'employee';
+
+function pickRole(role){
+  pendingRole = role;
+  document.getElementById('roleEmpBtn').classList.toggle('active', role==='employee');
+  document.getElementById('roleMgrBtn').classList.toggle('active', role==='manager');
+}
+
+function doLogin(){
+  const name = document.getElementById('loginName').value.trim();
+  if(!name){
+    document.getElementById('loginErr').style.display = 'block';
+    return;
+  }
+  session = { name, role: pendingRole };
+  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  applyLoginState();
+}
+
+function logout(){
+  session = null;
+  localStorage.removeItem(SESSION_KEY);
+  applyLoginState();
+}
+
+function applyLoginState(){
+  const gate = document.getElementById('loginGate');
+  if(!session){
+    gate.style.display = 'flex';
+    document.getElementById('logoutBtn').style.display = 'none';
+    document.getElementById('userBadge').style.display = 'none';
+    document.getElementById('newReqBtn').style.display = 'none';
+    return;
+  }
+  gate.style.display = 'none';
+  document.getElementById('logoutBtn').style.display = 'inline-block';
+  document.getElementById('newReqBtn').style.display = 'inline-block';
+  const badge = document.getElementById('userBadge');
+  badge.style.display = 'flex';
+  badge.innerHTML = `${escapeHtml(session.name)} <span class="role-tag">${session.role==='manager' ? (tr('roleManager')) : (tr('roleEmployee'))}</span>`;
+  render();
+}
+
+// Tasks the logged-in user is allowed to see: managers see everything,
+// employees only see work assigned to them.
+function visibleTasks(){
+  if(!session) return [];
+  if(session.role === 'manager') return tasks;
+  return tasks.filter(t => t.owner === session.name);
+}
+
+// ---------- i18n ----------
+let currentLang = localStorage.getItem('lala_lang') || 'en';
+
+const I18N = {
+  en: {
+    appTitle: 'Lala Tech · Request Tracker',
+    appSub: 'One place for every client request. No more lost WhatsApp asks.',
+    newRequest: '+ New Request',
+    loadDemo: 'Load demo data',
+    clearAll: 'Clear all',
+    searchPh: 'Search client or description...',
+    allOwners: 'All owners',
+    allStatuses: 'All statuses',
+    allBucket: 'All (waiting for us / client)',
+    waitingUs: 'Waiting for us',
+    waitingClient: 'Waiting for client',
+    followupOnly: 'Overdue / needs follow-up only',
+    listView: '☰ List', boardView: '▦ Board',
+    thClient: 'Client / Request', thSource: 'Source', thOwner: 'Owner',
+    thPriority: 'Priority', thStatus: 'Status', thDue: 'Due', thLast: 'Last Update',
+    roleManager: 'Manager', roleEmployee: 'Employee',
+    loginTitle: "Who's working right now?",
+    loginSub: 'Pick your role and enter your name to see your work.',
+    loginName: 'Your Name',
+    loginContinue: 'Continue',
+    loginErr: 'Please enter your name.',
+    emptyState: 'No requests match. Click "+ New Request" to log one, or "Load demo data" to see it in action.',
+    emptyEmployee: 'Nothing assigned to you right now.',
+    status: {New:'New Request', NeedsClarification:'Needs Clarification', ReadyToAssign:'Ready to Assign', InProgress:'In Progress', WaitingOnClient:'Waiting on Client', Done:'Done'},
+    attnTitle: '⚠ At a glance', attnSub: "Where every open request actually stands — no need to ask anyone.",
+    attnClearTitle: '✅ Nothing open right now', attnClearSub: 'No active requests — everything is done.',
+    colWaitingUs: 'Waiting for Us', colWaitingClient: 'Waiting for Client', colUnassigned: 'Unassigned', colOverdue: 'Overdue',
+    noneUs: 'Nothing on our plate', noneClient: 'Nothing pending from clients', noneUnassigned: 'All assigned', noneOverdue: 'Nothing overdue',
+    statOpen: 'Open Requests', statWaitUs: 'Waiting for Us', statWaitClient: 'Waiting for Client', statOverdue: 'Overdue', statDone: 'Done (last 7d)',
+    overdueFlag: '⚠ OVERDUE', followupFlag: '⏱ NEEDS FOLLOW-UP', clientFlag: '⏳ WAITING ON CLIENT',
+    modalNew: 'New Request', modalEdit: 'Edit Request',
+  },
+  hi: {
+    appTitle: 'Lala Tech · रिक्वेस्ट ट्रैकर',
+    appSub: 'हर क्लाइंट रिक्वेस्ट एक ही जगह। अब कोई WhatsApp मैसेज नहीं खोएगा।',
+    newRequest: '+ नई रिक्वेस्ट',
+    loadDemo: 'डेमो डेटा लोड करें',
+    clearAll: 'सब हटाएं',
+    searchPh: 'क्लाइंट या विवरण खोजें...',
+    allOwners: 'सभी ओनर',
+    allStatuses: 'सभी स्टेटस',
+    allBucket: 'सभी (हमारी तरफ / क्लाइंट की तरफ)',
+    waitingUs: 'हमारी तरफ लंबित',
+    waitingClient: 'क्लाइंट की तरफ लंबित',
+    followupOnly: 'केवल ओवरड्यू / फॉलो-अप वाली',
+    listView: '☰ लिस्ट', boardView: '▦ बोर्ड',
+    thClient: 'क्लाइंट / रिक्वेस्ट', thSource: 'स्रोत', thOwner: 'ओनर',
+    thPriority: 'प्राथमिकता', thStatus: 'स्टेटस', thDue: 'ड्यू डेट', thLast: 'अंतिम अपडेट',
+    roleManager: 'मैनेजर', roleEmployee: 'कर्मचारी',
+    loginTitle: 'अभी कौन काम कर रहा है?',
+    loginSub: 'अपना रोल चुनें और अपना काम देखने के लिए नाम डालें।',
+    loginName: 'आपका नाम',
+    loginContinue: 'आगे बढ़ें',
+    loginErr: 'कृपया अपना नाम डालें।',
+    emptyState: 'कोई रिक्वेस्ट नहीं मिली। "+ नई रिक्वेस्ट" पर क्लिक करें, या "डेमो डेटा लोड करें" आज़माएं।',
+    emptyEmployee: 'अभी आपको कोई काम असाइन नहीं है।',
+    status: {New:'नई रिक्वेस्ट', NeedsClarification:'स्पष्टीकरण चाहिए', ReadyToAssign:'असाइन के लिए तैयार', InProgress:'प्रगति में', WaitingOnClient:'क्लाइंट का इंतज़ार', Done:'पूर्ण'},
+    attnTitle: '⚠ एक नज़र में', attnSub: 'हर खुली रिक्वेस्ट कहां अटकी है — किसी से पूछने की ज़रूरत नहीं।',
+    attnClearTitle: '✅ अभी कुछ भी लंबित नहीं', attnClearSub: 'कोई सक्रिय रिक्वेस्ट नहीं — सब पूर्ण है।',
+    colWaitingUs: 'हमारी तरफ', colWaitingClient: 'क्लाइंट की तरफ', colUnassigned: 'असाइन नहीं', colOverdue: 'ओवरड्यू',
+    noneUs: 'हमारी तरफ कुछ नहीं', noneClient: 'क्लाइंट से कुछ लंबित नहीं', noneUnassigned: 'सब असाइन हो चुका', noneOverdue: 'कुछ भी ओवरड्यू नहीं',
+    statOpen: 'खुली रिक्वेस्ट', statWaitUs: 'हमारी तरफ', statWaitClient: 'क्लाइंट की तरफ', statOverdue: 'ओवरड्यू', statDone: 'पूर्ण (7 दिन)',
+    overdueFlag: '⚠ ओवरड्यू', followupFlag: '⏱ फॉलो-अप ज़रूरी', clientFlag: '⏳ क्लाइंट का इंतज़ार',
+    modalNew: 'नई रिक्वेस्ट', modalEdit: 'रिक्वेस्ट संपादित करें',
+  }
+};
+
+function tr(key){ return I18N[currentLang][key]; }
+
+function setLang(lang){
+  currentLang = lang;
+  localStorage.setItem('lala_lang', lang);
+  applyI18n();
+  render();
+}
+
+function applyI18n(){
+  document.getElementById('langEn').classList.toggle('active', currentLang==='en');
+  document.getElementById('langHi').classList.toggle('active', currentLang==='hi');
+  document.getElementById('appTitle').innerHTML = currentLang==='en'
+    ? 'Lala Tech <span class="dot">·</span> Request Tracker'
+    : 'Lala Tech <span class="dot">·</span> रिक्वेस्ट ट्रैकर';
+  document.getElementById('appSub').textContent = tr('appSub');
+  document.getElementById('newReqBtn').textContent = tr('newRequest');
+  document.getElementById('search').placeholder = tr('searchPh');
+  document.querySelector('#filterOwner option[value=""]').textContent = tr('allOwners');
+  document.querySelector('#filterStatus option[value=""]').textContent = tr('allStatuses');
+  document.querySelector('#filterBucket option[value=""]').textContent = tr('allBucket');
+  document.querySelector('#filterBucket option[value="us"]').textContent = tr('waitingUs');
+  document.querySelector('#filterBucket option[value="client"]').textContent = tr('waitingClient');
+  document.getElementById('followupLabel').textContent = tr('followupOnly');
+  document.getElementById('vtList').textContent = tr('listView');
+  document.getElementById('vtBoard').textContent = tr('boardView');
+  document.getElementById('demoBtn').textContent = tr('loadDemo');
+  document.getElementById('clearBtn').textContent = tr('clearAll');
+  ['New','NeedsClarification','ReadyToAssign','InProgress','WaitingOnClient','Done'].forEach(s=>{
+    const opt = document.querySelector(`#filterStatus option[value="${s}"]`);
+    if(opt) opt.textContent = tr('status')[s];
+    const fopt = document.querySelector(`#f_status option[value="${s}"]`);
+    if(fopt) fopt.textContent = tr('status')[s];
+  });
+  const ths = document.querySelectorAll('#listView thead th');
+  const thKeys = ['thClient','thSource','thOwner','thPriority','thStatus','thDue','thLast'];
+  ths.forEach((th,i)=>{ if(thKeys[i]) th.textContent = tr(thKeys[i]); });
+  document.getElementById('loginTitle').textContent = tr('loginTitle');
+  document.getElementById('loginSub').textContent = tr('loginSub');
+  document.getElementById('loginNameLabel').textContent = tr('loginName');
+  document.getElementById('loginBtn').textContent = tr('loginContinue');
+  document.getElementById('loginErr').textContent = tr('loginErr');
+  document.getElementById('roleEmpBtn').textContent = tr('roleEmployee');
+  document.getElementById('roleMgrBtn').textContent = tr('roleManager');
+  if(session){
+    const badge = document.getElementById('userBadge');
+    badge.innerHTML = `${escapeHtml(session.name)} <span class="role-tag">${session.role==='manager' ? tr('roleManager') : tr('roleEmployee')}</span>`;
+  }
+}
+
+function setView(v){
+  currentView = v;
+  localStorage.setItem('lala_view', v);
+  document.getElementById('vtList').classList.toggle('active', v==='list');
+  document.getElementById('vtBoard').classList.toggle('active', v==='board');
+  document.getElementById('listView').style.display = v==='list' ? 'table' : 'none';
+  document.getElementById('boardView').style.display = v==='board' ? 'grid' : 'none';
+  render();
+}
 
 function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); render(); }
 
@@ -208,18 +550,36 @@ function today(){ return new Date().toISOString().slice(0,10); }
 function daysSince(dateStr){
   return Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
 }
-function isOverdue(t){ return t.status!=='Done' && t.due && t.due < today(); }
-function isStale(t){ return t.status!=='Done' && daysSince(t.lastUpdated) >= 2; }
+
+// Statuses where the ball is in OUR court (we're the ones who need to act)
+const OUR_COURT = ['New','ReadyToAssign','InProgress'];
+// Statuses where the ball is in the CLIENT's court (we're blocked waiting on them)
+const CLIENT_COURT = ['NeedsClarification','WaitingOnClient'];
+
+function isOurCourt(t){ return OUR_COURT.includes(t.status); }
+function isClientCourt(t){ return CLIENT_COURT.includes(t.status); }
+
+// Overdue/stale only ever apply to work that's on US — a request waiting on the
+// client should never look like a forgotten internal task.
+function isOverdue(t){ return isOurCourt(t) && t.due && t.due < today(); }
+function isStale(t){ return isOurCourt(t) && daysSince(t.lastUpdated) >= 2; }
 
 function openAddModal(){
   editingId = null;
-  document.getElementById('modalTitle').textContent = 'New Request';
+  document.getElementById('modalTitle').textContent = tr('modalNew');
   document.getElementById('editId').value = '';
   document.getElementById('f_client').value = '';
   document.getElementById('f_desc').value = '';
   document.getElementById('f_source').value = 'WhatsApp';
   document.getElementById('f_priority').value = 'Medium';
-  document.getElementById('f_owner').value = '';
+  const ownerField = document.getElementById('f_owner');
+  if(session.role === 'employee'){
+    ownerField.value = session.name;
+    ownerField.disabled = true;
+  } else {
+    ownerField.value = '';
+    ownerField.disabled = false;
+  }
   document.getElementById('f_due').value = '';
   document.getElementById('f_status').value = 'New';
   document.getElementById('notesSection').style.display = 'none';
@@ -229,14 +589,19 @@ function openAddModal(){
 function openEditModal(id){
   const t = tasks.find(x=>x.id===id);
   if(!t) return;
+  // Defense in depth: an employee can only ever open work assigned to them,
+  // even if a stale click handler somehow fires for a task id they shouldn't see.
+  if(session.role==='employee' && t.owner !== session.name) return;
   editingId = id;
-  document.getElementById('modalTitle').textContent = 'Edit Request';
+  document.getElementById('modalTitle').textContent = tr('modalEdit');
   document.getElementById('editId').value = id;
   document.getElementById('f_client').value = t.client;
   document.getElementById('f_desc').value = t.desc;
   document.getElementById('f_source').value = t.source;
   document.getElementById('f_priority').value = t.priority;
-  document.getElementById('f_owner').value = t.owner;
+  const ownerField = document.getElementById('f_owner');
+  ownerField.value = t.owner;
+  ownerField.disabled = (session.role === 'employee');
   document.getElementById('f_due').value = t.due || '';
   document.getElementById('f_status').value = t.status;
   document.getElementById('notesSection').style.display = 'block';
@@ -303,76 +668,187 @@ function escapeHtml(s){
 }
 
 function statusLabel(s){
-  return {New:'New', InProgress:'In Progress', Waiting:'Waiting on Client', Done:'Done'}[s];
+  return tr('status')[s];
 }
 
 function updateOwnerFilters(){
+  // Owner filter dropdown: managers can filter by anyone; employees only ever
+  // see themselves, so the dropdown is redundant/locked for them.
   const owners = [...new Set(tasks.map(t=>t.owner))].sort();
   const sel = document.getElementById('filterOwner');
   const cur = sel.value;
-  sel.innerHTML = '<option value="">All owners</option>' + owners.map(o=>`<option>${escapeHtml(o)}</option>`).join('');
+  sel.innerHTML = `<option value="">${tr('allOwners')}</option>` + owners.map(o=>`<option>${escapeHtml(o)}</option>`).join('');
   sel.value = cur;
   document.getElementById('ownerList').innerHTML = owners.map(o=>`<option value="${escapeHtml(o)}">`).join('');
+  if(session && session.role==='employee'){
+    sel.value = session.name;
+    sel.disabled = true;
+  } else {
+    sel.disabled = false;
+  }
 }
 
 function render(){
+  if(!session) return;
   updateOwnerFilters();
   const q = document.getElementById('search').value.toLowerCase();
-  const fOwner = document.getElementById('filterOwner').value;
+  const fOwner = session.role==='employee' ? session.name : document.getElementById('filterOwner').value;
   const fStatus = document.getElementById('filterStatus').value;
+  const fBucket = document.getElementById('filterBucket').value;
   const onlyFollowup = document.getElementById('onlyFollowup').checked;
 
-  let filtered = tasks.filter(t=>{
+  let filtered = visibleTasks().filter(t=>{
     if(q && !(t.client.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q))) return false;
     if(fOwner && t.owner!==fOwner) return false;
     if(fStatus && t.status!==fStatus) return false;
+    if(fBucket==='us' && !isOurCourt(t)) return false;
+    if(fBucket==='client' && !isClientCourt(t)) return false;
     if(onlyFollowup && !(isStale(t)||isOverdue(t)) ) return false;
     return true;
   });
 
-  // sort: overdue/stale first, then by status
+  // sort: overdue first, then stale, then our-court, then client-court, then done
   filtered.sort((a,b)=>{
-    const score = t => (isOverdue(t)?0:isStale(t)?1:2) - (t.status==='Done'?2:0);
+    const score = t => {
+      if(t.status==='Done') return 5;
+      if(isOverdue(t)) return 0;
+      if(isStale(t)) return 1;
+      if(isOurCourt(t)) return 2;
+      if(isClientCourt(t)) return 3;
+      return 4;
+    };
     return score(a) - score(b);
   });
 
   const body = document.getElementById('taskBody');
-  if(filtered.length===0){
-    body.innerHTML = `<tr><td colspan="7"><div class="empty">No requests match. Click "+ New Request" to log one, or "Load demo data" to see it in action.</div></td></tr>`;
+  if(currentView === 'list'){
+    if(filtered.length===0){
+      const msg = (session.role==='employee' && tasks.length>0) ? tr('emptyEmployee') : tr('emptyState');
+      body.innerHTML = `<tr><td colspan="7"><div class="empty">${msg}</div></td></tr>`;
+    } else {
+      body.innerHTML = filtered.map(t=>`
+        <tr onclick="openEditModal('${t.id}')">
+          <td>
+            <div class="client-name">${escapeHtml(t.client)}</div>
+            <div class="desc">${escapeHtml(t.desc)}</div>
+            ${isOverdue(t)?`<div class="flag">${tr('overdueFlag')}</div>`
+              :isStale(t)?`<div class="flag" style="color:var(--amber);">${tr('followupFlag')}</div>`
+              :isClientCourt(t)?`<div class="flag" style="color:var(--purple);">${tr('clientFlag')}</div>`
+              :''}
+          </td>
+          <td>${t.source}</td>
+          <td><span class="owner-pill">${escapeHtml(t.owner)}</span></td>
+          <td><span class="prio ${t.priority}">${t.priority}</span></td>
+          <td><span class="badge ${t.status}">${statusLabel(t.status)}</span></td>
+          <td>${t.due || '—'}</td>
+          <td>${t.lastUpdated} <span style="color:var(--muted);">(${daysSince(t.lastUpdated)}d ago)</span></td>
+        </tr>
+      `).join('');
+    }
   } else {
-    body.innerHTML = filtered.map(t=>`
-      <tr onclick="openEditModal('${t.id}')">
-        <td>
-          <div class="client-name">${escapeHtml(t.client)}</div>
-          <div class="desc">${escapeHtml(t.desc)}</div>
-          ${isOverdue(t)?'<div class="flag">⚠ OVERDUE</div>':isStale(t)?'<div class="flag" style="color:var(--amber);">⏱ NEEDS FOLLOW-UP</div>':''}
-        </td>
-        <td>${t.source}</td>
-        <td><span class="owner-pill">${escapeHtml(t.owner)}</span></td>
-        <td><span class="prio ${t.priority}">${t.priority}</span></td>
-        <td><span class="badge ${t.status}">${statusLabel(t.status)}</span></td>
-        <td>${t.due || '—'}</td>
-        <td>${t.lastUpdated} <span style="color:var(--muted);">(${daysSince(t.lastUpdated)}d ago)</span></td>
-      </tr>
-    `).join('');
+    renderBoard(filtered);
   }
 
+  renderAttention();
   renderStats();
 }
 
+const BOARD_COLUMNS = ['New','NeedsClarification','ReadyToAssign','InProgress','WaitingOnClient','Done'];
+
+function renderBoard(filtered){
+  const board = document.getElementById('boardView');
+  board.innerHTML = BOARD_COLUMNS.map(status=>{
+    const items = filtered.filter(t=>t.status===status);
+    return `
+      <div class="board-col">
+        <div class="board-col-head">
+          <span class="badge ${status}">${statusLabel(status)}</span>
+          <span class="board-count">${items.length}</span>
+        </div>
+        <div class="board-col-body">
+          ${items.length===0 ? '<div class="board-empty">No requests</div>' :
+            items.map(t=>`
+              <div class="board-card" onclick="openEditModal('${t.id}')">
+                <div class="bc-top">
+                  <span class="client-name">${escapeHtml(t.client)}</span>
+                  <span class="prio ${t.priority}">${t.priority}</span>
+                </div>
+                <div class="desc">${escapeHtml(t.desc.slice(0,70))}${t.desc.length>70?'…':''}</div>
+                ${isOverdue(t)?`<div class="flag">${tr('overdueFlag')}</div>`
+                  :isStale(t)?`<div class="flag" style="color:var(--amber);">${tr('followupFlag')}</div>`
+                  :isClientCourt(t)?`<div class="flag" style="color:var(--purple);">${tr('clientFlag')}</div>`
+                  :''}
+                <div class="bc-bottom">
+                  <span class="owner-pill">${escapeHtml(t.owner)}</span>
+                  <span class="bc-due">${t.due || '—'}</span>
+                </div>
+              </div>
+            `).join('')
+          }
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderAttention(){
+  const open = visibleTasks().filter(t=>t.status!=='Done');
+  const overdue = open.filter(isOverdue);
+  const waitingForUs = open.filter(isOurCourt);       // ball is on our team
+  const waitingForClient = open.filter(isClientCourt); // ball is on the client
+  const unassigned = open.filter(t=>t.owner==='Unassigned');
+
+  const panel = document.getElementById('attentionPanel');
+  const totalAttn = overdue.length + waitingForUs.length + unassigned.length; // client-blocked items aren't "urgent" by default
+
+  if(open.length === 0){
+    panel.innerHTML = `
+      <div class="attention clear">
+        <h2>${tr('attnClearTitle')}</h2>
+        <div class="sub">${tr('attnClearSub')}</div>
+      </div>`;
+    return;
+  }
+
+  const col = (title, dotClass, items, emptyMsg, highlightOverdue) => `
+    <div class="attn-col">
+      <h3><span class="dot ${dotClass}"></span>${title} (${items.length})</h3>
+      ${items.length===0 ? `<div class="attn-none">${emptyMsg}</div>` :
+        items.slice(0,4).map(t=>`
+          <div class="attn-item" onclick="openEditModal('${t.id}')">
+            <div class="c">${escapeHtml(t.client)} ${highlightOverdue && isOverdue(t) ? '<span style="color:var(--red);">⚠</span>' : ''}</div>
+            <div class="d">${escapeHtml(t.desc.slice(0,50))}${t.desc.length>50?'…':''} · ${escapeHtml(t.owner)}</div>
+          </div>
+        `).join('') + (items.length>4 ? `<div class="attn-more">+${items.length-4} more</div>` : '')
+      }
+    </div>`;
+
+  panel.innerHTML = `
+    <div class="attention">
+      <h2>${tr('attnTitle')}</h2>
+      <div class="sub">${tr('attnSub')}</div>
+      <div class="attn-grid">
+        ${col(tr('colWaitingUs'), 'amber', waitingForUs, tr('noneUs'), true)}
+        ${col(tr('colWaitingClient'), 'purple', waitingForClient, tr('noneClient'), false)}
+        ${col(tr('colUnassigned'), 'gray', unassigned, tr('noneUnassigned'), false)}
+        ${col(tr('colOverdue'), 'red', overdue, tr('noneOverdue'), false)}
+      </div>
+    </div>`;
+}
+
 function renderStats(){
-  const open = tasks.filter(t=>t.status!=='Done');
-  const overdue = tasks.filter(isOverdue);
-  const stale = tasks.filter(t=>isStale(t) && !isOverdue(t));
-  const doneThisWeek = tasks.filter(t=>t.status==='Done' && daysSince(t.lastUpdated) <= 7);
-  const unassigned = tasks.filter(t=>t.status!=='Done' && t.owner==='Unassigned');
+  const vis = visibleTasks();
+  const open = vis.filter(t=>t.status!=='Done');
+  const overdue = vis.filter(isOverdue);
+  const waitingForUs = vis.filter(t=>t.status!=='Done' && isOurCourt(t));
+  const waitingForClient = vis.filter(t=>t.status!=='Done' && isClientCourt(t));
+  const doneThisWeek = vis.filter(t=>t.status==='Done' && daysSince(t.lastUpdated) <= 7);
 
   const cards = [
-    {label:'Open Requests', num:open.length, cls:''},
-    {label:'Overdue', num:overdue.length, cls:'overdue'},
-    {label:'Needs Follow-up', num:stale.length, cls:'stale'},
-    {label:'Done (last 7d)', num:doneThisWeek.length, cls:'done'},
-    {label:'Unassigned (open)', num:unassigned.length, cls:overdue.length?'overdue':''},
+    {label:tr('statOpen'), num:open.length, cls:''},
+    {label:tr('statWaitUs'), num:waitingForUs.length, cls:'stale'},
+    {label:tr('statWaitClient'), num:waitingForClient.length, cls:''},
+    {label:tr('statOverdue'), num:overdue.length, cls:'overdue'},
+    {label:tr('statDone'), num:doneThisWeek.length, cls:'done'},
   ];
   document.getElementById('stats').innerHTML = cards.map(c=>`
     <div class="stat-card ${c.cls}"><div class="num">${c.num}</div><div class="label">${c.label}</div></div>
@@ -387,21 +863,56 @@ function clearAll(){
 }
 
 function seedDemo(){
-  const now = today();
   const past = (d)=> new Date(Date.now()-d*86400000).toISOString().slice(0,10);
   tasks = [
-    {id:uid(), client:'Acme Corp', desc:'Requested revised quote for Q4 order, sent via WhatsApp', source:'WhatsApp', owner:'Priya', priority:'High', status:'New', due:past(-1), created:past(3), lastUpdated:past(3), notes:[]},
-    {id:uid(), client:'Nova Retail', desc:'Wants invoice #2291 corrected — wrong GST amount', source:'Email', owner:'Rahul', priority:'High', status:'InProgress', due:past(-2), created:past(5), lastUpdated:past(0), notes:[{date:past(0)+' 10:20 AM', text:'Reached out to accounts team, awaiting corrected invoice.'}]},
-    {id:uid(), client:'Bluebird Logistics', desc:'Asked for delivery timeline update on bulk order', source:'WhatsApp', owner:'Priya', priority:'Medium', status:'Waiting', due:past(-3), created:past(6), lastUpdated:past(4), notes:[]},
-    {id:uid(), client:'Studio Kite', desc:'Follow-up on proposal sent last week, no response yet', source:'Email', owner:'Unassigned', priority:'Medium', status:'New', due:past(-1), created:past(4), lastUpdated:past(4), notes:[]},
-    {id:uid(), client:'Solar Homes Pvt Ltd', desc:'Confirmed order, needs onboarding call scheduled', source:'Call', owner:'Rahul', priority:'Low', status:'Done', due:past(2), created:past(2), lastUpdated:past(0), notes:[{date:past(0)+' 9:00 AM', text:'Onboarding call completed, client happy.'}]},
-    {id:uid(), client:'Metro Textiles', desc:'Complaint about damaged shipment, wants replacement', source:'WhatsApp', owner:'Priya', priority:'High', status:'InProgress', due:past(0), created:past(1), lastUpdated:past(0), notes:[{date:past(0)+' 11:00 AM', text:'Replacement dispatched, tracking sent to client.'}]},
+    // Waiting for CLIENT — needs clarification before we can even assign it.
+    // Note: due date is in the past, but it will NOT show as overdue, because
+    // the client hasn't given us what we need yet — that's not our delay.
+    {id:uid(), client:'Studio Kite', desc:'Wants a custom package but hasn\'t specified quantity or sizes yet', source:'Email', owner:'Unassigned', priority:'Medium', status:'NeedsClarification', due:past(-3), created:past(4), lastUpdated:past(1), notes:[
+      {date:past(4)+' 3:00 PM', text:'Request came in via email, but scope is unclear. Asked client for quantity and size breakdown.'},
+      {date:past(1)+' 10:00 AM', text:'Followed up — still waiting on client to reply with details.'}
+    ]},
+
+    // Ready to Assign — client gave clarification, just needs an owner
+    {id:uid(), client:'Nova Retail', desc:'Wants invoice #2291 corrected — GST amount was wrong', source:'Email', owner:'Unassigned', priority:'High', status:'ReadyToAssign', due:past(-1), created:past(5), lastUpdated:past(1), notes:[
+      {date:past(5)+' 11:00 AM', text:'Client confirmed the correct GST rate over email.'},
+      {date:past(1)+' 9:30 AM', text:'Ready for someone to pick up and issue the corrected invoice.'}
+    ]},
+
+    // Waiting for us — In Progress, on track
+    {id:uid(), client:'Bluebird Logistics', desc:'Delivery timeline update requested for bulk order', source:'WhatsApp', owner:'Priya', priority:'Medium', status:'InProgress', due:past(-1), created:past(3), lastUpdated:past(0), notes:[
+      {date:past(0)+' 9:15 AM', text:'Checked with logistics partner, timeline update going out to client today.'}
+    ]},
+
+    // Waiting for CLIENT — mid-pipeline, we did our part and are blocked on them.
+    // Also has a due date in the past — again, NOT flagged overdue since it's their move.
+    {id:uid(), client:'Metro Textiles', desc:'Sent replacement options for damaged shipment, awaiting client\'s choice', source:'WhatsApp', owner:'Priya', priority:'High', status:'WaitingOnClient', due:past(-2), created:past(6), lastUpdated:past(3), notes:[
+      {date:past(6)+' 9:12 AM', text:'Request came in on WhatsApp: 3 boxes arrived damaged, client wants replacement.'},
+      {date:past(5)+' 2:40 PM', text:'Confirmed replacement stock available, sent client 2 options to choose from.'},
+      {date:past(3)+' 4:00 PM', text:'No response yet — sent a gentle nudge. Ball is in their court, not flagged as overdue.'}
+    ]},
+
+    // Genuinely overdue — an internal task that's actually been forgotten
+    {id:uid(), client:'Acme Corp', desc:'Revised Q4 quote requested, still not sent', source:'WhatsApp', owner:'Rahul', priority:'High', status:'InProgress', due:past(-3), created:past(4), lastUpdated:past(4), notes:[
+      {date:past(4)+' 2:00 PM', text:'Assigned to Rahul to prepare revised quote.'}
+    ]},
+
+    {id:uid(), client:'Solar Homes Pvt Ltd', desc:'Onboarding call scheduled and completed', source:'Call', owner:'Rahul', priority:'Low', status:'Done', due:past(2), created:past(2), lastUpdated:past(0), notes:[
+      {date:past(0)+' 9:00 AM', text:'Onboarding call completed, client happy.'}
+    ]},
   ];
   save();
 }
 
 // init
 if(tasks.length===0) seedDemo(); else save();
+document.getElementById('vtList').classList.toggle('active', currentView==='list');
+document.getElementById('vtBoard').classList.toggle('active', currentView==='board');
+document.getElementById('listView').style.display = currentView==='list' ? 'table' : 'none';
+document.getElementById('boardView').style.display = currentView==='board' ? 'grid' : 'none';
+applyI18n();
+applyLoginState();
+pickRole('employee');
 </script>
 
 </body>
