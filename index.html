@@ -42,6 +42,30 @@
   .attn-badge{display:none;align-items:center;justify-content:center;min-width:22px;height:22px;padding:0 6px;background:var(--red);color:#fff;font-size:12px;font-weight:700;border-radius:11px;margin-left:8px;vertical-align:middle;animation:pulseAttn 1.8s ease-in-out infinite;}
   @keyframes pulseAttn{0%,100%{box-shadow:0 0 0 0 rgba(240,80,90,0.5);}50%{box-shadow:0 0 0 6px rgba(240,80,90,0);}}
 
+  /* Splash screen — doors open from the center, sliding apart to reveal login */
+  .splash{position:fixed;inset:0;z-index:200;overflow:hidden;}
+  .splash-panel{
+    position:absolute;top:0;bottom:0;width:50%;
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(91,141,239,0.14), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 0%, rgba(167,139,250,0.10), transparent 55%),
+      var(--bg);
+    background-attachment:fixed;
+    transition:transform 1.3s ease;
+  }
+  .splash-panel.left{left:0;}
+  .splash-panel.right{right:0;}
+  .splash.fade-out{pointer-events:none;}
+  .splash.fade-out .splash-panel.left{transform:translateX(-100%);}
+  .splash.fade-out .splash-panel.right{transform:translateX(100%);}
+  .splash-inner{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.9s ease;}
+  .splash.fade-out .splash-inner{opacity:0;}
+  .splash-inner{text-align:center;animation:splashIn 0.5s ease;}
+  @keyframes splashIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  .splash-logo{font-size:34px;font-weight:800;letter-spacing:-0.02em;color:var(--text);}
+  .splash-logo .dot{color:var(--accent);}
+  .splash-tagline{color:var(--muted);font-size:13px;margin-top:8px;letter-spacing:0.02em;}
+
   /* Login gate */
   .login-bg{position:fixed;inset:0;background:var(--bg);z-index:100;display:flex;align-items:center;justify-content:center;}
   .login-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:28px;width:360px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.5);}
@@ -214,6 +238,15 @@
 </style>
 </head>
 <body>
+
+<div class="splash" id="splashScreen">
+  <div class="splash-panel left"></div>
+  <div class="splash-panel right"></div>
+  <div class="splash-inner">
+    <div class="splash-logo">Lala Tech <span class="dot">·</span> Request Tracker</div>
+    <div class="splash-tagline" id="splashTagline">One place for every client request.</div>
+  </div>
+</div>
 
 <header>
   <div>
@@ -438,6 +471,7 @@ const I18N = {
     loginName: 'Your Name',
     loginContinue: 'Continue',
     loginErr: 'Please enter your name.',
+    splashTagline: 'One place for every client request.',
     emptyState: 'No requests match. Click "+ New Request" to log one, or "Load demo data" to see it in action.',
     emptyEmployee: 'Nothing assigned to you right now.',
     status: {New:'New Request', NeedsClarification:'Needs Clarification', ReadyToAssign:'Ready to Assign', InProgress:'In Progress', WaitingOnClient:'Waiting on Client', Done:'Done'},
@@ -471,6 +505,7 @@ const I18N = {
     loginName: 'आपका नाम',
     loginContinue: 'आगे बढ़ें',
     loginErr: 'कृपया अपना नाम डालें।',
+    splashTagline: 'हर क्लाइंट रिक्वेस्ट के लिए एक जगह।',
     emptyState: 'कोई रिक्वेस्ट नहीं मिली। "+ नई रिक्वेस्ट" पर क्लिक करें, या "डेमो डेटा लोड करें" आज़माएं।',
     emptyEmployee: 'अभी आपको कोई काम असाइन नहीं है।',
     status: {New:'नई रिक्वेस्ट', NeedsClarification:'स्पष्टीकरण चाहिए', ReadyToAssign:'असाइन के लिए तैयार', InProgress:'प्रगति में', WaitingOnClient:'क्लाइंट का इंतज़ार', Done:'पूर्ण'},
@@ -528,6 +563,8 @@ function applyI18n(){
   document.getElementById('loginErr').textContent = tr('loginErr');
   document.getElementById('roleEmpBtn').textContent = tr('roleEmployee');
   document.getElementById('roleMgrBtn').textContent = tr('roleManager');
+  const tagline = document.getElementById('splashTagline');
+  if(tagline) tagline.textContent = tr('splashTagline');
   if(session){
     const badge = document.getElementById('userBadge');
     badge.innerHTML = `${escapeHtml(session.name)} <span class="role-tag">${session.role==='manager' ? tr('roleManager') : tr('roleEmployee')}</span>`;
@@ -924,6 +961,14 @@ document.getElementById('boardView').style.display = currentView==='board' ? 'gr
 applyI18n();
 applyLoginState();
 pickRole('employee');
+
+// Splash: show the logo, hold, then split down the center and slide the two
+// halves apart to reveal the login/app screen underneath.
+const splash = document.getElementById('splashScreen');
+setTimeout(()=>{
+  splash.classList.add('fade-out');
+  setTimeout(()=>{ splash.style.display = 'none'; }, 1350);
+}, 2000);
 </script>
 
 </body>
