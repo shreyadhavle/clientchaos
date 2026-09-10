@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lala Tech — Request Tracker</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1e2229; --border:#2a2f3a;
+    --text:#e8eaed; --muted:#9aa2b1; --accent:#5b8def; --green:#3ecf8e;
+    --amber:#f5a524; --red:#f0505a; --purple:#a78bfa;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);}
+  header{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:18px 28px;border-bottom:1px solid var(--border);
+    position:sticky;top:0;background:var(--bg);z-index:10;
+  }
+  header h1{font-size:18px;margin:0;font-weight:700;}
+  header .sub{color:var(--muted);font-size:12px;margin-top:2px;}
+  .btn{
+    background:var(--accent);color:#fff;border:none;padding:9px 16px;
+    border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;
+  }
+  .btn:hover{opacity:0.9;}
+  .btn.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--border);}
+  main{padding:20px 28px 60px;max-width:1300px;margin:0 auto;}
+
+  .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:22px;}
+  .stat-card{
+    background:var(--panel);border:1px solid var(--border);border-radius:12px;
+    padding:16px 18px;
+  }
+  .stat-card .num{font-size:26px;font-weight:700;}
+  .stat-card .label{color:var(--muted);font-size:12.5px;margin-top:4px;}
+  .stat-card.overdue .num{color:var(--red);}
+  .stat-card.stale .num{color:var(--amber);}
+  .stat-card.done .num{color:var(--green);}
+
+  .controls{
+    display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;
+  }
+  .controls input, .controls select{
+    background:var(--panel2);border:1px solid var(--border);color:var(--text);
+    padding:8px 10px;border-radius:8px;font-size:13px;
+  }
+  .controls input{flex:1;min-width:180px;}
+  .spacer{flex:1;}
+
+  table{width:100%;border-collapse:collapse;background:var(--panel);border-radius:12px;overflow:hidden;border:1px solid var(--border);}
+  thead th{
+    text-align:left;font-size:12px;color:var(--muted);text-transform:uppercase;
+    letter-spacing:0.03em;padding:12px 14px;border-bottom:1px solid var(--border);background:var(--panel2);
+  }
+  tbody td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13.5px;vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:#1b1f28;cursor:pointer;}
+  .client-name{font-weight:600;}
+  .desc{color:var(--muted);font-size:12.5px;margin-top:2px;max-width:280px;}
+
+  .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:600;}
+  .badge.New{background:#2a3550;color:#8fb4ff;}
+  .badge.InProgress{background:#3a3320;color:var(--amber);}
+  .badge.Waiting{background:#3a2545;color:var(--purple);}
+  .badge.Done{background:#1e3a2e;color:var(--green);}
+
+  .prio{font-size:11.5px;font-weight:700;padding:2px 7px;border-radius:5px;}
+  .prio.High{background:#3a1f22;color:var(--red);}
+  .prio.Medium{background:#3a3320;color:var(--amber);}
+  .prio.Low{background:#232a38;color:var(--muted);}
+
+  .flag{color:var(--red);font-size:11px;font-weight:700;margin-top:4px;}
+  .owner-pill{background:var(--panel2);padding:3px 9px;border-radius:20px;font-size:12px;border:1px solid var(--border);}
+
+  .modal-bg{
+    display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);
+    align-items:center;justify-content:center;z-index:50;
+  }
+  .modal-bg.open{display:flex;}
+  .modal{
+    background:var(--panel);border:1px solid var(--border);border-radius:14px;
+    padding:24px;width:480px;max-width:92vw;max-height:88vh;overflow-y:auto;
+  }
+  .modal h2{margin-top:0;font-size:17px;}
+  .field{margin-bottom:13px;}
+  .field label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600;}
+  .field input,.field select,.field textarea{
+    width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text);
+    padding:9px 10px;border-radius:8px;font-size:13.5px;font-family:inherit;
+  }
+  .field textarea{resize:vertical;min-height:60px;}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;}
+
+  .notes-list{max-height:180px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px;margin-bottom:10px;background:var(--panel2);}
+  .note{padding:6px 8px;border-bottom:1px solid var(--border);font-size:12.5px;}
+  .note:last-child{border-bottom:none;}
+  .note .meta{color:var(--muted);font-size:11px;margin-bottom:2px;}
+  .empty{color:var(--muted);text-align:center;padding:40px;font-size:13px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Lala Tech — Request Tracker</h1>
+    <div class="sub">One place for every client request. No more lost WhatsApp asks.</div>
+  </div>
+  <button class="btn" onclick="openAddModal()">+ New Request</button>
+</header>
+
+<main>
+  <div class="stats" id="stats"></div>
+
+  <div class="controls">
+    <input id="search" placeholder="Search client or description..." oninput="render()">
+    <select id="filterOwner" onchange="render()"><option value="">All owners</option></select>
+    <select id="filterStatus" onchange="render()">
+      <option value="">All statuses</option>
+      <option value="New">New</option>
+      <option value="InProgress">In Progress</option>
+      <option value="Waiting">Waiting on Client</option>
+      <option value="Done">Done</option>
+    </select>
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);">
+      <input type="checkbox" id="onlyFollowup" onchange="render()" style="width:auto;"> Needs follow-up only
+    </label>
+    <div class="spacer"></div>
+    <button class="btn secondary" onclick="seedDemo()">Load demo data</button>
+    <button class="btn secondary" onclick="clearAll()">Clear all</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Client / Request</th>
+        <th>Source</th>
+        <th>Owner</th>
+        <th>Priority</th>
+        <th>Status</th>
+        <th>Due</th>
+        <th>Last Update</th>
+      </tr>
+    </thead>
+    <tbody id="taskBody"></tbody>
+  </table>
+</main>
+
+<!-- Add/Edit Modal -->
+<div class="modal-bg" id="taskModalBg">
+  <div class="modal">
+    <h2 id="modalTitle">New Request</h2>
+    <input type="hidden" id="editId">
+    <div class="field"><label>Client Name</label><input id="f_client" placeholder="e.g. Acme Corp"></div>
+    <div class="field"><label>Request Description</label><textarea id="f_desc" placeholder="What did they ask for?"></textarea></div>
+    <div class="row2">
+      <div class="field"><label>Source</label>
+        <select id="f_source">
+          <option>WhatsApp</option><option>Email</option><option>Call</option><option>Manual</option>
+        </select>
+      </div>
+      <div class="field"><label>Priority</label>
+        <select id="f_priority"><option>Low</option><option selected>Medium</option><option>High</option></select>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>Owner</label><input id="f_owner" list="ownerList" placeholder="e.g. Priya"></div>
+      <div class="field"><label>Due Date</label><input id="f_due" type="date"></div>
+    </div>
+    <div class="field"><label>Status</label>
+      <select id="f_status">
+        <option value="New">New</option>
+        <option value="InProgress">In Progress</option>
+        <option value="Waiting">Waiting on Client</option>
+        <option value="Done">Done</option>
+      </select>
+    </div>
+
+    <div id="notesSection" style="display:none;">
+      <label style="display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600;">Context / Updates Log</label>
+      <div class="notes-list" id="notesList"></div>
+      <div style="display:flex;gap:8px;">
+        <input id="f_newnote" placeholder="Add a quick update..." style="flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:8px 10px;border-radius:8px;font-size:13px;">
+        <button class="btn secondary" onclick="addNote()">Add</button>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="saveTask()">Save</button>
+    </div>
+  </div>
+</div>
+
+<datalist id="ownerList"></datalist>
+
+<script>
+const STORAGE_KEY = 'lala_tasks_v1';
+let tasks = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+let editingId = null;
+
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); render(); }
+
+function uid(){ return 't_' + Math.random().toString(36).slice(2,10); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function daysSince(dateStr){
+  return Math.floor((Date.now() - new Date(dateStr).getTime()) / 86400000);
+}
+function isOverdue(t){ return t.status!=='Done' && t.due && t.due < today(); }
+function isStale(t){ return t.status!=='Done' && daysSince(t.lastUpdated) >= 2; }
+
+function openAddModal(){
+  editingId = null;
+  document.getElementById('modalTitle').textContent = 'New Request';
+  document.getElementById('editId').value = '';
+  document.getElementById('f_client').value = '';
+  document.getElementById('f_desc').value = '';
+  document.getElementById('f_source').value = 'WhatsApp';
+  document.getElementById('f_priority').value = 'Medium';
+  document.getElementById('f_owner').value = '';
+  document.getElementById('f_due').value = '';
+  document.getElementById('f_status').value = 'New';
+  document.getElementById('notesSection').style.display = 'none';
+  document.getElementById('taskModalBg').classList.add('open');
+}
+
+function openEditModal(id){
+  const t = tasks.find(x=>x.id===id);
+  if(!t) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'Edit Request';
+  document.getElementById('editId').value = id;
+  document.getElementById('f_client').value = t.client;
+  document.getElementById('f_desc').value = t.desc;
+  document.getElementById('f_source').value = t.source;
+  document.getElementById('f_priority').value = t.priority;
+  document.getElementById('f_owner').value = t.owner;
+  document.getElementById('f_due').value = t.due || '';
+  document.getElementById('f_status').value = t.status;
+  document.getElementById('notesSection').style.display = 'block';
+  renderNotes(t);
+  document.getElementById('taskModalBg').classList.add('open');
+}
+
+function renderNotes(t){
+  const list = document.getElementById('notesList');
+  if(!t.notes || t.notes.length===0){
+    list.innerHTML = '<div class="empty" style="padding:14px;">No updates logged yet.</div>';
+    return;
+  }
+  list.innerHTML = t.notes.slice().reverse().map(n=>`
+    <div class="note"><div class="meta">${n.date}</div>${escapeHtml(n.text)}</div>
+  `).join('');
+}
+
+function addNote(){
+  const text = document.getElementById('f_newnote').value.trim();
+  if(!text || !editingId) return;
+  const t = tasks.find(x=>x.id===editingId);
+  t.notes = t.notes || [];
+  t.notes.push({date: new Date().toLocaleString(), text});
+  t.lastUpdated = today();
+  document.getElementById('f_newnote').value = '';
+  renderNotes(t);
+}
+
+function closeModal(){
+  document.getElementById('taskModalBg').classList.remove('open');
+}
+
+function saveTask(){
+  const client = document.getElementById('f_client').value.trim();
+  const desc = document.getElementById('f_desc').value.trim();
+  if(!client || !desc){ alert('Client name and description are required.'); return; }
+
+  const data = {
+    client, desc,
+    source: document.getElementById('f_source').value,
+    priority: document.getElementById('f_priority').value,
+    owner: document.getElementById('f_owner').value.trim() || 'Unassigned',
+    due: document.getElementById('f_due').value,
+    status: document.getElementById('f_status').value,
+  };
+
+  if(editingId){
+    const t = tasks.find(x=>x.id===editingId);
+    Object.assign(t, data);
+    t.lastUpdated = today();
+  } else {
+    tasks.push({
+      id: uid(), ...data,
+      created: today(), lastUpdated: today(), notes: []
+    });
+  }
+  closeModal();
+  save();
+}
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function statusLabel(s){
+  return {New:'New', InProgress:'In Progress', Waiting:'Waiting on Client', Done:'Done'}[s];
+}
+
+function updateOwnerFilters(){
+  const owners = [...new Set(tasks.map(t=>t.owner))].sort();
+  const sel = document.getElementById('filterOwner');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">All owners</option>' + owners.map(o=>`<option>${escapeHtml(o)}</option>`).join('');
+  sel.value = cur;
+  document.getElementById('ownerList').innerHTML = owners.map(o=>`<option value="${escapeHtml(o)}">`).join('');
+}
+
+function render(){
+  updateOwnerFilters();
+  const q = document.getElementById('search').value.toLowerCase();
+  const fOwner = document.getElementById('filterOwner').value;
+  const fStatus = document.getElementById('filterStatus').value;
+  const onlyFollowup = document.getElementById('onlyFollowup').checked;
+
+  let filtered = tasks.filter(t=>{
+    if(q && !(t.client.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q))) return false;
+    if(fOwner && t.owner!==fOwner) return false;
+    if(fStatus && t.status!==fStatus) return false;
+    if(onlyFollowup && !(isStale(t)||isOverdue(t)) ) return false;
+    return true;
+  });
+
+  // sort: overdue/stale first, then by status
+  filtered.sort((a,b)=>{
+    const score = t => (isOverdue(t)?0:isStale(t)?1:2) - (t.status==='Done'?2:0);
+    return score(a) - score(b);
+  });
+
+  const body = document.getElementById('taskBody');
+  if(filtered.length===0){
+    body.innerHTML = `<tr><td colspan="7"><div class="empty">No requests match. Click "+ New Request" to log one, or "Load demo data" to see it in action.</div></td></tr>`;
+  } else {
+    body.innerHTML = filtered.map(t=>`
+      <tr onclick="openEditModal('${t.id}')">
+        <td>
+          <div class="client-name">${escapeHtml(t.client)}</div>
+          <div class="desc">${escapeHtml(t.desc)}</div>
+          ${isOverdue(t)?'<div class="flag">⚠ OVERDUE</div>':isStale(t)?'<div class="flag" style="color:var(--amber);">⏱ NEEDS FOLLOW-UP</div>':''}
+        </td>
+        <td>${t.source}</td>
+        <td><span class="owner-pill">${escapeHtml(t.owner)}</span></td>
+        <td><span class="prio ${t.priority}">${t.priority}</span></td>
+        <td><span class="badge ${t.status}">${statusLabel(t.status)}</span></td>
+        <td>${t.due || '—'}</td>
+        <td>${t.lastUpdated} <span style="color:var(--muted);">(${daysSince(t.lastUpdated)}d ago)</span></td>
+      </tr>
+    `).join('');
+  }
+
+  renderStats();
+}
+
+function renderStats(){
+  const open = tasks.filter(t=>t.status!=='Done');
+  const overdue = tasks.filter(isOverdue);
+  const stale = tasks.filter(t=>isStale(t) && !isOverdue(t));
+  const doneThisWeek = tasks.filter(t=>t.status==='Done' && daysSince(t.lastUpdated) <= 7);
+  const unassigned = tasks.filter(t=>t.status!=='Done' && t.owner==='Unassigned');
+
+  const cards = [
+    {label:'Open Requests', num:open.length, cls:''},
+    {label:'Overdue', num:overdue.length, cls:'overdue'},
+    {label:'Needs Follow-up', num:stale.length, cls:'stale'},
+    {label:'Done (last 7d)', num:doneThisWeek.length, cls:'done'},
+    {label:'Unassigned (open)', num:unassigned.length, cls:overdue.length?'overdue':''},
+  ];
+  document.getElementById('stats').innerHTML = cards.map(c=>`
+    <div class="stat-card ${c.cls}"><div class="num">${c.num}</div><div class="label">${c.label}</div></div>
+  `).join('');
+}
+
+function clearAll(){
+  if(confirm('Delete all requests? This cannot be undone.')){
+    tasks = [];
+    save();
+  }
+}
+
+function seedDemo(){
+  const now = today();
+  const past = (d)=> new Date(Date.now()-d*86400000).toISOString().slice(0,10);
+  tasks = [
+    {id:uid(), client:'Acme Corp', desc:'Requested revised quote for Q4 order, sent via WhatsApp', source:'WhatsApp', owner:'Priya', priority:'High', status:'New', due:past(-1), created:past(3), lastUpdated:past(3), notes:[]},
+    {id:uid(), client:'Nova Retail', desc:'Wants invoice #2291 corrected — wrong GST amount', source:'Email', owner:'Rahul', priority:'High', status:'InProgress', due:past(-2), created:past(5), lastUpdated:past(0), notes:[{date:past(0)+' 10:20 AM', text:'Reached out to accounts team, awaiting corrected invoice.'}]},
+    {id:uid(), client:'Bluebird Logistics', desc:'Asked for delivery timeline update on bulk order', source:'WhatsApp', owner:'Priya', priority:'Medium', status:'Waiting', due:past(-3), created:past(6), lastUpdated:past(4), notes:[]},
+    {id:uid(), client:'Studio Kite', desc:'Follow-up on proposal sent last week, no response yet', source:'Email', owner:'Unassigned', priority:'Medium', status:'New', due:past(-1), created:past(4), lastUpdated:past(4), notes:[]},
+    {id:uid(), client:'Solar Homes Pvt Ltd', desc:'Confirmed order, needs onboarding call scheduled', source:'Call', owner:'Rahul', priority:'Low', status:'Done', due:past(2), created:past(2), lastUpdated:past(0), notes:[{date:past(0)+' 9:00 AM', text:'Onboarding call completed, client happy.'}]},
+    {id:uid(), client:'Metro Textiles', desc:'Complaint about damaged shipment, wants replacement', source:'WhatsApp', owner:'Priya', priority:'High', status:'InProgress', due:past(0), created:past(1), lastUpdated:past(0), notes:[{date:past(0)+' 11:00 AM', text:'Replacement dispatched, tracking sent to client.'}]},
+  ];
+  save();
+}
+
+// init
+if(tasks.length===0) seedDemo(); else save();
+</script>
+
+</body>
+</html>
